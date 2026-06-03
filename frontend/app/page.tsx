@@ -594,6 +594,16 @@ export default function Home() {
         }
 
         div[style] > span {
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        div[style] > span + b,
+        div[style] > span + strong {
+          display: block;
+        }
+
+        div[style] > span {
           line-height: 1.2;
         }
 

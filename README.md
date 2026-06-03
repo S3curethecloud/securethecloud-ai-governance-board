@@ -246,3 +246,45 @@ CONFIRM_DESTROY=YES scripts/fly_demo_control.sh destroy
 Share only the frontend URL.
 
 Do not share the reset token, Fly account access, or local environment variables.
+
+## Public Demo
+
+Frontend:
+
+```text
+https://securethecloud-ai-governance-board.fly.dev
+
+Backend API:
+
+https://securethecloud-ai-governance-board-api.fly.dev
+How to Review This Demo
+
+Recommended review path:
+
+Open the public frontend demo.
+Start with the executive overview and governance operating model.
+Review the AI system intake workflow.
+Preview a governance decision and required controls.
+Open the governance committee review workspace.
+Review NIST AI RMF-style mapping and EU AI Act-style classification.
+Review the HIPAA-style AI review board workflow.
+Inspect the board audit trail.
+Use the Board Evidence Export panel to download or copy the audit-ready JSON evidence packet and executive board decision memo.
+Portfolio Screenshots
+Screenshot	Description
+docs/screenshots/01-executive-overview.png	Executive overview and governance operating model
+docs/screenshots/02-ai-system-intake.png	AI system intake and governance preview
+docs/screenshots/03-governance-review.png	Governance committee review workspace
+docs/screenshots/04-nist-eu-hipaa-mapping.png	NIST AI RMF, EU AI Act-style, and HIPAA-style review panels
+docs/screenshots/05-board-audit-trail.png	Evidence timeline and board audit trail
+docs/screenshots/06-evidence-export-memo.png	Evidence export and executive decision memo
+docs/screenshots/07-mobile-responsive.png	Mobile responsive demo view
+Share-Safe Summary
+
+This is a simulated, production-shaped AI governance board.
+
+It is safe to share as a portfolio/client demo because it does not connect to real patient data, customer records, regulated production systems, production model runtimes, clinical decision systems, enterprise authorization systems, or production enforcement systems.
+
+Correct claim:
+
+SecureTheCloud AI Governance Board demonstrates AI system intake, risk classification, governance committee review, regulatory mapping, evidence reconstruction, and board-ready evidence export in a simulated environment.
