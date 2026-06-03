@@ -295,6 +295,10 @@ export default function Home() {
           max-width: 100%;
         }
 
+        div[style] > span {
+          line-height: 1.2;
+        }
+
         @media (max-width: 980px) {
           body {
             background: #020617;
@@ -1017,7 +1021,7 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 12
   },
   reviewGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginTop: 18 },
-  reviewActionGrid: { display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 10, marginTop: 14 },
+  reviewActionGrid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, marginTop: 14 },
   approveButton: {
     border: "0",
     borderRadius: 12,
@@ -1127,13 +1131,16 @@ const styles: Record<string, CSSProperties> = {
   panelTitle: { fontSize: 26, margin: "8px 0" },
   muted: { color: "#cbd5e1" },
   feed: { display: "grid", gap: 14, marginTop: 18 },
-  record: { border: "1px solid #334155", borderRadius: 16, padding: 16, background: "#020617", cursor: "pointer", overflowWrap: "anywhere" },
+  record: { border: "1px solid #334155", borderRadius: 16, padding: 16, background: "#020617", cursor: "pointer", overflowWrap: "anywhere", color: "#eaf2ff", font: "inherit" },
   selectedRecord: { borderColor: "#22d3ee", boxShadow: "0 0 0 1px rgba(34,211,238,.35)" },
   recordHead: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "start" },
   badge: {
     border: "1px solid #38bdf8",
     maxWidth: "100%",
-    overflowWrap: "anywhere",
+    minWidth: 88,
+    textAlign: "center",
+    overflowWrap: "normal",
+    wordBreak: "normal",
     color: "#bae6fd",
     background: "rgba(8,47,73,.45)",
     borderRadius: 999,
