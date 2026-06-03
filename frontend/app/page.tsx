@@ -1280,18 +1280,18 @@ export default function Home() {
             </p>
 
             <div style={styles.phase8ExportCard}>
-              <div>
+              <div style={styles.phase8MetaRow}>
                 <span style={styles.metaLabel}>Selected System</span>
                 <strong>{selectedSystem.system_name}</strong>
               </div>
-              <div>
+              <div style={styles.phase8MetaRow}>
                 <span style={styles.metaLabel}>Risk / Outcome</span>
                 <strong>
                   {selectedSystem.risk_assessment.risk_classification.replaceAll("_", " ")} ·{" "}
                   {selectedSystem.final_outcome.replaceAll("_", " ")}
                 </strong>
               </div>
-              <div>
+              <div style={styles.phase8MetaRow}>
                 <span style={styles.metaLabel}>Evidence Coverage</span>
                 <strong>{buildEvidenceCompleteness(selectedSystem).coverage}%</strong>
               </div>
@@ -1323,7 +1323,7 @@ export default function Home() {
             </div>
 
             <div style={styles.phase8JsonPreview}>
-              <pre>{JSON.stringify(buildBoardEvidencePacket(selectedSystem), null, 2).slice(0, 1800)}...</pre>
+              <pre style={styles.preWrap}>{JSON.stringify(buildBoardEvidencePacket(selectedSystem), null, 2).slice(0, 1800)}...</pre>
             </div>
           </div>
 
@@ -1336,7 +1336,7 @@ export default function Home() {
             </p>
 
             <div style={styles.phase8MemoCard}>
-              <pre>{buildBoardDecisionMemo(selectedSystem)}</pre>
+              <pre style={styles.preWrap}>{buildBoardDecisionMemo(selectedSystem)}</pre>
             </div>
 
             <div style={styles.phase8ButtonGrid}>
@@ -2068,6 +2068,21 @@ const styles: Record<string, CSSProperties> = {
     padding: 16,
     background: "rgba(8, 47, 73, .22)",
     marginTop: 14
+  },
+
+  phase8MetaRow: {
+    display: "grid",
+    gap: 4,
+    alignItems: "start",
+    minWidth: 0
+  },
+  preWrap: {
+    margin: 0,
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word",
+    fontSize: 12,
+    lineHeight: 1.45
   },
 
   footer: {
