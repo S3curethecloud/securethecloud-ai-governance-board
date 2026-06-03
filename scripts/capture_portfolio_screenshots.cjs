@@ -5,13 +5,28 @@ const baseUrl = process.env.DEMO_URL || "https://securethecloud-ai-governance-bo
 const outDir = "docs/screenshots";
 
 const shots = [
-  ["01-executive-overview.png", "SecureTheCloud AI Governance Board"],
-  ["02-ai-system-intake.png", "Phase 3"],
-  ["03-governance-review.png", "Phase 4"],
-  ["04-nist-eu-hipaa-mapping.png", "Phase 5"],
-  ["05-board-audit-trail.png", "Phase 7"],
-  ["06-evidence-export-memo.png", "Phase 8"]
+  ["01-executive-overview.png", "SecureTheCloud AI Governance Board", 0],
+  ["02-ai-system-intake.png", "AI System Intake", 0.24],
+  ["03-governance-review.png", "Governance Committee", 0.42],
+  ["04-nist-eu-hipaa-mapping.png", "NIST AI RMF Mapping Console", 0.56],
+  ["05-board-audit-trail.png", "Board Audit Trail", 0.74],
+  ["06-evidence-export-memo.png", "Evidence Package Export", 0.88]
 ];
+
+async function scrollToTextOrRatio(page, text, ratio) {
+  try {
+    const locator = page.getByText(text, { exact: false }).first();
+    await locator.scrollIntoViewIfNeeded({ timeout: 8000 });
+    await page.waitForTimeout(1200);
+    return;
+  } catch {
+    const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+    const viewportHeight = await page.evaluate(() => window.innerHeight);
+    const y = Math.max(0, Math.floor((scrollHeight - viewportHeight) * ratio));
+    await page.evaluate((targetY) => window.scrollTo(0, targetY), y);
+    await page.waitForTimeout(1200);
+  }
+}
 
 (async () => {
   await fs.mkdir(outDir, { recursive: true });
@@ -26,14 +41,8 @@ const shots = [
   await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90000 });
   await page.waitForTimeout(3000);
 
-  for (const [filename, text] of shots) {
-    try {
-      await page.getByText(text, { exact: false }).first().scrollIntoViewIfNeeded({ timeout: 8000 });
-      await page.waitForTimeout(1000);
-    } catch {
-      console.log(`Could not scroll to "${text}"; capturing current viewport.`);
-    }
-
+  for (const [filename, text, ratio] of shots) {
+    await scrollToTextOrRatio(page, text, ratio);
     await page.screenshot({ path: `${outDir}/${filename}`, fullPage: false });
     console.log(`Captured ${filename}`);
   }
