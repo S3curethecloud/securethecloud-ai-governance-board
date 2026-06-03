@@ -1248,6 +1248,26 @@ const styles: Record<string, CSSProperties> = {
     background: "rgba(20, 83, 45, .18)",
     marginTop: 14
   },
+  reviewMetaGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: 10,
+    marginTop: 14
+  },
+  reviewMetaCard: {
+    border: "1px solid #334155",
+    borderRadius: 12,
+    padding: 12,
+    background: "rgba(2, 6, 23, .55)",
+    display: "grid",
+    gap: 4,
+    minWidth: 0
+  },
+  metaLabel: {
+    color: "#dbeafe",
+    fontSize: 13,
+    lineHeight: 1.2
+  },
   chipWrap: {
     display: "flex",
     flexWrap: "wrap",
