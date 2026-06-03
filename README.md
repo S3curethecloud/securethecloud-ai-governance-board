@@ -283,7 +283,7 @@ Share-Safe Summary
 
 This is a simulated, production-shaped AI governance board.
 
-It is safe to share as a portfolio/client demo because it does not connect to real patient data, customer records, regulated production systems, production model runtimes, clinical decision systems, enterprise authorization systems, or production enforcement systems.
+It is safe to share as a public demo because it does not connect to real patient data, customer records, regulated production systems, production model runtimes, clinical decision systems, enterprise authorization systems, or production enforcement systems.
 
 Correct claim:
 
