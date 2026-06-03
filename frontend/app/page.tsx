@@ -71,6 +71,30 @@ type ModelRegistryEntry = {
   monitoring_status: string;
 };
 
+
+type AISystemCreate = {
+  system_name: string;
+  business_owner: string;
+  model_owner: string;
+  department: string;
+  domain: string;
+  use_case: string;
+  model_name: string;
+  model_provider: string;
+  deployment_environment: string;
+  target_users: string;
+  data_types: string[];
+  phi_involved: boolean;
+  customer_data_involved: boolean;
+  automated_decisioning: boolean;
+  clinical_or_patient_impact: boolean;
+  financial_or_credit_impact: boolean;
+  security_enforcement_impact: boolean;
+  safety_critical: boolean;
+  human_oversight: string;
+  approval_status: string;
+};
+
 const boardModules = [
   ["Governance Committee", "Submitted systems, pending reviews, decisions, owners, and evidence.", "#22d3ee"],
   ["AI Model Registry", "Model owner, use case, provider, risk class, approval status, and monitoring.", "#6ee75f"],
@@ -88,12 +112,39 @@ const platformLayers = [
   ["Executive Oversight", "Show AI inventory posture, pending work, and governance coverage."]
 ];
 
+
+const defaultForm: AISystemCreate = {
+  system_name: "Clinical Intake Prioritization Assistant",
+  business_owner: "Care Operations",
+  model_owner: "AI Governance Team",
+  department: "Healthcare",
+  domain: "healthcare",
+  use_case: "Prioritize patient intake messages for human care team review",
+  model_name: "clinical-intake-priority-v1",
+  model_provider: "internal",
+  deployment_environment: "pilot",
+  target_users: "care coordinators",
+  data_types: ["PHI", "clinical notes"],
+  phi_involved: true,
+  customer_data_involved: false,
+  automated_decisioning: true,
+  clinical_or_patient_impact: true,
+  financial_or_credit_impact: false,
+  security_enforcement_impact: false,
+  safety_critical: false,
+  human_oversight: "human_in_loop",
+  approval_status: "pending_review"
+};
+
 export default function Home() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [systems, setSystems] = useState<AISystem[]>([]);
   const [registry, setRegistry] = useState<ModelRegistryEntry[]>([]);
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null);
   const [status, setStatus] = useState("Loading AI governance telemetry...");
+  const [form, setForm] = useState<AISystemCreate>(defaultForm);
+  const [preview, setPreview] = useState<RiskAssessment | null>(null);
+  const [submitStatus, setSubmitStatus] = useState("Ready for AI system intake.");
 
   async function loadData() {
     const [dashboardRes, systemsRes, registryRes] = await Promise.all([
@@ -109,6 +160,62 @@ export default function Home() {
     setRegistry(await registryRes.json());
     setSelectedSystemId((current) => current ?? nextSystems[0]?.system_id ?? null);
     setStatus("Live backend connected");
+  }
+
+  function updateForm<K extends keyof AISystemCreate>(key: K, value: AISystemCreate[K]) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function toggleDataType(value: string) {
+    setForm((current) => {
+      const exists = current.data_types.includes(value);
+      return {
+        ...current,
+        data_types: exists
+          ? current.data_types.filter((item) => item !== value)
+          : [...current.data_types, value]
+      };
+    });
+  }
+
+  async function previewGovernance() {
+    setSubmitStatus("Calculating governance preview...");
+
+    const res = await fetch(`${API_BASE}/api/governance/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
+
+    if (!res.ok) {
+      setSubmitStatus("Governance preview failed.");
+      return;
+    }
+
+    const nextPreview: RiskAssessment = await res.json();
+    setPreview(nextPreview);
+    setSubmitStatus(`Preview ready: ${nextPreview.decision.replaceAll("_", " ")} / ${nextPreview.risk_classification.replaceAll("_", " ")}`);
+  }
+
+  async function submitGovernedSystem() {
+    setSubmitStatus("Submitting AI system for governance review...");
+
+    const res = await fetch(`${API_BASE}/api/ai-systems`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
+
+    if (!res.ok) {
+      setSubmitStatus("AI system submission failed.");
+      return;
+    }
+
+    const created: AISystem = await res.json();
+    setSubmitStatus(`Submitted: ${created.system_name} → ${created.final_outcome.replaceAll("_", " ")}`);
+    setPreview(created.risk_assessment);
+    await loadData();
+    setSelectedSystemId(created.system_id);
   }
 
   useEffect(() => {
@@ -235,6 +342,155 @@ export default function Home() {
           </div>
         </section>
 
+        <section style={styles.intakeGrid}>
+          <div style={styles.panel}>
+            <p style={styles.kicker}>Phase 3 · AI System Intake</p>
+            <h2 style={styles.panelTitle}>Submit AI System for Governance Review</h2>
+            <p style={styles.muted}>
+              Capture ownership, use case, deployment context, data exposure, impact flags, human oversight, and approval status before AI adoption.
+            </p>
+
+            <div style={styles.formGrid}>
+              <Field label="AI System Name" value={form.system_name} onChange={(value) => updateForm("system_name", value)} />
+              <Field label="Business Owner" value={form.business_owner} onChange={(value) => updateForm("business_owner", value)} />
+              <Field label="Model Owner" value={form.model_owner} onChange={(value) => updateForm("model_owner", value)} />
+              <Field label="Department" value={form.department} onChange={(value) => updateForm("department", value)} />
+              <Field label="Model Name" value={form.model_name} onChange={(value) => updateForm("model_name", value)} />
+              <Field label="Model Provider" value={form.model_provider} onChange={(value) => updateForm("model_provider", value)} />
+            </div>
+
+            <div style={styles.formGrid}>
+              <SelectField
+                label="Business Domain"
+                value={form.domain}
+                options={["healthcare", "financial_services", "security", "enterprise_internal", "consumer_platform", "research"]}
+                onChange={(value) => updateForm("domain", value)}
+              />
+              <SelectField
+                label="Deployment Environment"
+                value={form.deployment_environment}
+                options={["proposed", "sandbox", "pilot", "production"]}
+                onChange={(value) => updateForm("deployment_environment", value)}
+              />
+              <SelectField
+                label="Human Oversight"
+                value={form.human_oversight}
+                options={["none", "human_in_loop", "human_on_loop", "human_review_after"]}
+                onChange={(value) => updateForm("human_oversight", value)}
+              />
+              <SelectField
+                label="Approval Status"
+                value={form.approval_status}
+                options={["submitted", "pending_review", "approved", "rejected", "escalation_required"]}
+                onChange={(value) => updateForm("approval_status", value)}
+              />
+            </div>
+
+            <Field label="Target Users" value={form.target_users} onChange={(value) => updateForm("target_users", value)} />
+
+            <label style={styles.label}>
+              Use Case
+              <textarea
+                style={styles.textarea}
+                value={form.use_case}
+                onChange={(event) => updateForm("use_case", event.target.value)}
+              />
+            </label>
+
+            <div style={styles.checkboxSection}>
+              <strong>Data Types</strong>
+              <div style={styles.checkGrid}>
+                {["PHI", "clinical notes", "customer data", "transaction metadata", "engagement data", "internal policy documents", "biometric"].map((item) => (
+                  <label key={item} style={styles.checkItem}>
+                    <input
+                      type="checkbox"
+                      checked={form.data_types.includes(item)}
+                      onChange={() => toggleDataType(item)}
+                    />
+                    {item}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={styles.checkboxSection}>
+              <strong>Impact Flags</strong>
+              <div style={styles.checkGrid}>
+                <BoolField label="PHI involved" checked={form.phi_involved} onChange={(value) => updateForm("phi_involved", value)} />
+                <BoolField label="Customer data involved" checked={form.customer_data_involved} onChange={(value) => updateForm("customer_data_involved", value)} />
+                <BoolField label="Automated decisioning" checked={form.automated_decisioning} onChange={(value) => updateForm("automated_decisioning", value)} />
+                <BoolField label="Clinical / patient impact" checked={form.clinical_or_patient_impact} onChange={(value) => updateForm("clinical_or_patient_impact", value)} />
+                <BoolField label="Financial / credit impact" checked={form.financial_or_credit_impact} onChange={(value) => updateForm("financial_or_credit_impact", value)} />
+                <BoolField label="Security enforcement impact" checked={form.security_enforcement_impact} onChange={(value) => updateForm("security_enforcement_impact", value)} />
+                <BoolField label="Safety critical" checked={form.safety_critical} onChange={(value) => updateForm("safety_critical", value)} />
+              </div>
+            </div>
+
+            <div style={styles.buttonRow}>
+              <button style={styles.secondaryButton} onClick={previewGovernance}>
+                Preview Governance Decision
+              </button>
+              <button style={styles.primaryButton} onClick={submitGovernedSystem}>
+                Submit to Governance Board
+              </button>
+            </div>
+
+            <div style={styles.statusBox}>{submitStatus}</div>
+          </div>
+
+          <div style={styles.panel}>
+            <p style={styles.kicker}>Governance Preview</p>
+            <h2 style={styles.panelTitle}>Risk, Classification & Required Controls</h2>
+            <p style={styles.muted}>
+              Preview evaluates the AI system before board submission.
+            </p>
+
+            {(preview ?? selectedSystem?.risk_assessment) && (
+              <div style={styles.previewBox}>
+                <div style={styles.recordHead}>
+                  <strong>Governance Decision</strong>
+                  <span style={classificationStyle((preview ?? selectedSystem!.risk_assessment).risk_classification)}>
+                    {(preview ?? selectedSystem!.risk_assessment).risk_classification.replaceAll("_", " ").toUpperCase()}
+                  </span>
+                </div>
+
+                <h3 style={styles.previewScore}>
+                  {(preview ?? selectedSystem!.risk_assessment).risk_score}/100
+                </h3>
+
+                <p>
+                  Decision: <b>{(preview ?? selectedSystem!.risk_assessment).decision.replaceAll("_", " ")}</b>
+                </p>
+
+                <p>
+                  EU AI Act style class:{" "}
+                  <b>{(preview ?? selectedSystem!.risk_assessment).ai_act_classification.replaceAll("_", " ")}</b>
+                </p>
+
+                <p>{(preview ?? selectedSystem!.risk_assessment).reason}</p>
+
+                <div style={styles.evidenceBox}>
+                  <strong>Risk Factors</strong>
+                  <div style={styles.pillGrid}>
+                    {(preview ?? selectedSystem!.risk_assessment).risk_factors.map((item) => (
+                      <span key={item} style={styles.pill}>{item}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={styles.evidenceBox}>
+                  <strong>Required Controls</strong>
+                  <div style={styles.pillGrid}>
+                    {(preview ?? selectedSystem!.risk_assessment).required_controls.map((item) => (
+                      <span key={item} style={styles.pill}>{item}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
         <section style={styles.workspace}>
           <div style={styles.panel}>
             <p style={styles.kicker}>Governance Committee Workspace</p>
@@ -356,6 +612,65 @@ export default function Home() {
         </footer>
       </section>
     </main>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label style={styles.label}>
+      {label}
+      <input style={styles.input} value={value} onChange={(event) => onChange(event.target.value)} />
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  options,
+  onChange
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label style={styles.label}>
+      {label}
+      <select style={styles.input} value={value} onChange={(event) => onChange(event.target.value)}>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option.replaceAll("_", " ")}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function BoolField({
+  label,
+  checked,
+  onChange
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <label style={styles.checkItem}>
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      {label}
+    </label>
   );
 }
 
@@ -510,6 +825,75 @@ const styles: Record<string, CSSProperties> = {
     padding: "4px 12px",
     fontSize: 12
   },
+  intakeGrid: { display: "grid", gridTemplateColumns: "1.25fr .9fr", gap: 18, marginTop: 18 },
+  formGrid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12, marginTop: 14 },
+  label: { display: "grid", gap: 6, color: "#dbeafe", fontSize: 13, fontWeight: 800, marginTop: 12 },
+  input: {
+    width: "100%",
+    border: "1px solid #334155",
+    borderRadius: 10,
+    background: "#020617",
+    color: "#eaf2ff",
+    padding: "12px 14px",
+    fontSize: 14,
+    boxSizing: "border-box"
+  },
+  textarea: {
+    width: "100%",
+    minHeight: 86,
+    border: "1px solid #334155",
+    borderRadius: 10,
+    background: "#020617",
+    color: "#eaf2ff",
+    padding: "12px 14px",
+    fontSize: 14,
+    boxSizing: "border-box"
+  },
+  checkboxSection: {
+    border: "1px solid #334155",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 14,
+    background: "rgba(2,6,23,.45)"
+  },
+  checkGrid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, marginTop: 10 },
+  checkItem: { display: "flex", alignItems: "center", gap: 8, color: "#dbeafe", fontSize: 13, fontWeight: 700 },
+  buttonRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 },
+  primaryButton: {
+    border: "0",
+    borderRadius: 12,
+    background: "#22d3ee",
+    color: "#020617",
+    padding: "14px 16px",
+    fontWeight: 900,
+    cursor: "pointer"
+  },
+  secondaryButton: {
+    border: "1px solid #22d3ee",
+    borderRadius: 12,
+    background: "rgba(8,47,73,.4)",
+    color: "#eaf2ff",
+    padding: "14px 16px",
+    fontWeight: 900,
+    cursor: "pointer"
+  },
+  statusBox: {
+    border: "1px solid #22d3ee",
+    borderRadius: 12,
+    padding: 12,
+    color: "#67e8f9",
+    background: "rgba(8,47,73,.32)",
+    marginTop: 14,
+    fontWeight: 800
+  },
+  previewBox: {
+    border: "1px solid #22d3ee",
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 18,
+    background: "#020617"
+  },
+  previewScore: { fontSize: 48, margin: "16px 0 6px", color: "#fcd34d" },
   workspace: { display: "grid", gridTemplateColumns: "1fr 1fr 1.45fr", gap: 18, marginTop: 18 },
   panel: {
     border: "1px solid #334155",
