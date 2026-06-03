@@ -145,6 +145,7 @@ export default function Home() {
   const [form, setForm] = useState<AISystemCreate>(defaultForm);
   const [preview, setPreview] = useState<RiskAssessment | null>(null);
   const [submitStatus, setSubmitStatus] = useState("Ready for AI system intake.");
+  const isMobile = useIsMobile();
 
   async function loadData() {
     const [dashboardRes, systemsRes, registryRes] = await Promise.all([
@@ -248,27 +249,64 @@ export default function Home() {
   }, [dashboard]);
 
   return (
-    <main style={styles.page}>
+    <main style={responsive(styles.page, isMobile && styles.pageMobile)}>
+      <style jsx global>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        html,
+        body {
+          margin: 0;
+          max-width: 100%;
+          overflow-x: hidden;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+          max-width: 100%;
+        }
+
+        @media (max-width: 980px) {
+          body {
+            background: #020617;
+          }
+        }
+      `}</style>
       <section style={styles.shell}>
-        <header style={styles.hero}>
+        <header style={responsive(styles.hero, isMobile && styles.heroMobile)}>
           <div>
-            <div style={styles.brand}>🛡️ SecureTheCloud</div>
+            <div style={responsive(styles.brand, isMobile && styles.brandMobile)}>🛡️ SecureTheCloud</div>
             <p style={styles.kicker}>AI Governance Board</p>
-            <h1 style={styles.title}>SecureTheCloud AI Governance Board</h1>
-            <p style={styles.subtitle}>
+            <h1 style={responsive(styles.title, isMobile && styles.titleMobile)}>
+              {isMobile ? (
+                <>
+                  SecureTheCloud
+                  <br />
+                  AI Governance
+                  <br />
+                  Board
+                </>
+              ) : (
+                "SecureTheCloud AI Governance Board"
+              )}
+            </h1>
+            <p style={responsive(styles.subtitle, isMobile && styles.subtitleMobile)}>
               A simulated enterprise AI governance review platform for AI system intake, model registry,
               risk classification, regulatory mapping, approval evidence, and executive oversight.
             </p>
           </div>
 
-          <div style={styles.doctrine}>
+          <div style={responsive(styles.doctrine, isMobile && styles.doctrineMobile)}>
             <strong>Core Principle</strong>
             <span>AI systems may be proposed, reviewed, risk-scored, mapped, approved, monitored, and governed.</span>
             <span>AI systems may not be deployed or connected to sensitive data without governance review and evidence.</span>
           </div>
         </header>
 
-        <section style={styles.boundary}>
+        <section style={responsive(styles.boundary, isMobile && styles.oneColumnGrid)}>
           <div style={styles.boundaryCard}>
             <strong>Client Demo Boundary</strong>
             <span>Simulated AI governance workflow. No real patient data, customer data, regulated systems, or production enforcement are connected.</span>
@@ -287,7 +325,7 @@ export default function Home() {
           <h2 style={styles.sectionTitle}>AI Governance Operating Model</h2>
           <p style={styles.sectionSub}>Board-level governance services for enterprise AI system oversight.</p>
 
-          <div style={styles.fabricGrid}>
+          <div style={responsive(styles.fabricGrid, isMobile && styles.oneColumnGrid)}>
             {boardModules.map(([name, desc, color]) => (
               <div key={name} style={{ ...styles.fabricCard, borderColor: color }}>
                 <div style={{ ...styles.hex, color }}>⬡</div>
@@ -299,7 +337,7 @@ export default function Home() {
         </section>
 
         {dashboard && (
-          <section style={styles.metrics}>
+          <section style={responsive(styles.metrics, isMobile && styles.metricsMobile)}>
             <Metric label="AI Systems" value={dashboard.total_ai_systems} />
             <Metric label="Pending Reviews" value={dashboard.pending_reviews} />
             <Metric label="High Risk" value={dashboard.high_risk_systems} />
@@ -309,7 +347,7 @@ export default function Home() {
           </section>
         )}
 
-        <section style={styles.executive}>
+        <section style={responsive(styles.executive, isMobile && styles.executiveMobile)}>
           <div>
             <p style={styles.kicker}>Executive AI Governance View</p>
             <h2 style={styles.sectionTitleLeft}>AI System Risk & Review Center</h2>
@@ -328,9 +366,9 @@ export default function Home() {
 
         <section style={styles.layerSection}>
           <h2 style={styles.sectionTitle}>Governance Board Platform Layers</h2>
-          <div style={styles.layerGrid}>
+          <div style={responsive(styles.layerGrid, isMobile && styles.oneColumnGrid)}>
             {platformLayers.map(([name, desc]) => (
-              <div key={name} style={styles.layerCard}>
+              <div key={name} style={responsive(styles.layerCard, isMobile && styles.layerCardMobile)}>
                 <div style={styles.cube}>◇</div>
                 <div>
                   <strong>{name}</strong>
@@ -342,15 +380,15 @@ export default function Home() {
           </div>
         </section>
 
-        <section style={styles.intakeGrid}>
-          <div style={styles.panel}>
+        <section style={responsive(styles.intakeGrid, isMobile && styles.oneColumnGrid)}>
+          <div style={responsive(styles.panel, isMobile && styles.panelMobile)}>
             <p style={styles.kicker}>Phase 3 · AI System Intake</p>
             <h2 style={styles.panelTitle}>Submit AI System for Governance Review</h2>
             <p style={styles.muted}>
               Capture ownership, use case, deployment context, data exposure, impact flags, human oversight, and approval status before AI adoption.
             </p>
 
-            <div style={styles.formGrid}>
+            <div style={responsive(styles.formGrid, isMobile && styles.oneColumnGrid)}>
               <Field label="AI System Name" value={form.system_name} onChange={(value) => updateForm("system_name", value)} />
               <Field label="Business Owner" value={form.business_owner} onChange={(value) => updateForm("business_owner", value)} />
               <Field label="Model Owner" value={form.model_owner} onChange={(value) => updateForm("model_owner", value)} />
@@ -359,7 +397,7 @@ export default function Home() {
               <Field label="Model Provider" value={form.model_provider} onChange={(value) => updateForm("model_provider", value)} />
             </div>
 
-            <div style={styles.formGrid}>
+            <div style={responsive(styles.formGrid, isMobile && styles.oneColumnGrid)}>
               <SelectField
                 label="Business Domain"
                 value={form.domain}
@@ -399,7 +437,7 @@ export default function Home() {
 
             <div style={styles.checkboxSection}>
               <strong>Data Types</strong>
-              <div style={styles.checkGrid}>
+              <div style={responsive(styles.checkGrid, isMobile && styles.oneColumnGrid)}>
                 {["PHI", "clinical notes", "customer data", "transaction metadata", "engagement data", "internal policy documents", "biometric"].map((item) => (
                   <label key={item} style={styles.checkItem}>
                     <input
@@ -415,7 +453,7 @@ export default function Home() {
 
             <div style={styles.checkboxSection}>
               <strong>Impact Flags</strong>
-              <div style={styles.checkGrid}>
+              <div style={responsive(styles.checkGrid, isMobile && styles.oneColumnGrid)}>
                 <BoolField label="PHI involved" checked={form.phi_involved} onChange={(value) => updateForm("phi_involved", value)} />
                 <BoolField label="Customer data involved" checked={form.customer_data_involved} onChange={(value) => updateForm("customer_data_involved", value)} />
                 <BoolField label="Automated decisioning" checked={form.automated_decisioning} onChange={(value) => updateForm("automated_decisioning", value)} />
@@ -426,7 +464,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div style={styles.buttonRow}>
+            <div style={responsive(styles.buttonRow, isMobile && styles.oneColumnGrid)}>
               <button style={styles.secondaryButton} onClick={previewGovernance}>
                 Preview Governance Decision
               </button>
@@ -438,7 +476,7 @@ export default function Home() {
             <div style={styles.statusBox}>{submitStatus}</div>
           </div>
 
-          <div style={styles.panel}>
+          <div style={responsive(styles.panel, isMobile && styles.panelMobile)}>
             <p style={styles.kicker}>Governance Preview</p>
             <h2 style={styles.panelTitle}>Risk, Classification & Required Controls</h2>
             <p style={styles.muted}>
@@ -491,8 +529,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section style={styles.workspace}>
-          <div style={styles.panel}>
+        <section style={responsive(styles.workspace, isMobile && styles.oneColumnGrid)}>
+          <div style={responsive(styles.panel, isMobile && styles.panelMobile)}>
             <p style={styles.kicker}>Governance Committee Workspace</p>
             <h2 style={styles.panelTitle}>Submitted AI Systems</h2>
             <p style={styles.muted}>Live seeded AI governance records from the Phase 1 backend.</p>
@@ -527,7 +565,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={styles.panel}>
+          <div style={responsive(styles.panel, isMobile && styles.panelMobile)}>
             <p style={styles.kicker}>AI Model Registry</p>
             <h2 style={styles.panelTitle}>Model Inventory</h2>
             <p style={styles.muted}>Model ownership, use case, risk class, and monitoring posture.</p>
@@ -552,7 +590,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ ...styles.panel, ...styles.detailPanel }}>
+          <div style={responsive({ ...styles.panel, ...styles.detailPanel }, isMobile && styles.panelMobile)}>
             <p style={styles.kicker}>Evidence Package Preview</p>
             <h2 style={styles.panelTitle}>Selected AI System Review</h2>
 
@@ -571,7 +609,7 @@ export default function Home() {
 
                   <p>{selectedSystem.risk_assessment.reason}</p>
 
-                  <div style={styles.detailGrid}>
+                  <div style={responsive(styles.detailGrid, isMobile && styles.oneColumnGrid)}>
                     <Detail label="Business Owner" value={selectedSystem.business_owner} />
                     <Detail label="Model Owner" value={selectedSystem.model_owner} />
                     <Detail label="Human Oversight" value={selectedSystem.human_oversight.replaceAll("_", " ")} />
@@ -581,7 +619,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div style={styles.mappingGrid}>
+                <div style={responsive(styles.mappingGrid, isMobile && styles.oneColumnGrid)}>
                   {Object.entries(selectedSystem.risk_assessment.nist_mapping).map(([fn, controls]) => (
                     <div key={fn} style={styles.mappingCard}>
                       <strong>{fn.toUpperCase()}</strong>
@@ -613,6 +651,23 @@ export default function Home() {
       </section>
     </main>
   );
+}
+
+function responsive(...items: Array<CSSProperties | false | null | undefined>): CSSProperties {
+  return Object.assign({}, ...items.filter(Boolean));
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 980);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return isMobile;
 }
 
 function Field({
@@ -716,7 +771,7 @@ const styles: Record<string, CSSProperties> = {
     fontFamily: "Inter, Arial, sans-serif",
     padding: 28
   },
-  shell: { maxWidth: 1500, margin: "0 auto" },
+  shell: { maxWidth: 1500, margin: "0 auto", overflowX: "hidden" },
   hero: {
     border: "1px solid #334155",
     borderRadius: 24,
@@ -907,21 +962,24 @@ const styles: Record<string, CSSProperties> = {
   panelTitle: { fontSize: 26, margin: "8px 0" },
   muted: { color: "#cbd5e1" },
   feed: { display: "grid", gap: 14, marginTop: 18 },
-  record: { border: "1px solid #334155", borderRadius: 16, padding: 16, background: "#020617", cursor: "pointer" },
+  record: { border: "1px solid #334155", borderRadius: 16, padding: 16, background: "#020617", cursor: "pointer", overflowWrap: "anywhere" },
   selectedRecord: { borderColor: "#22d3ee", boxShadow: "0 0 0 1px rgba(34,211,238,.35)" },
   recordHead: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "start" },
   badge: {
     border: "1px solid #38bdf8",
+    maxWidth: "100%",
+    overflowWrap: "anywhere",
     color: "#bae6fd",
     background: "rgba(8,47,73,.45)",
     borderRadius: 999,
     padding: "8px 12px",
     fontSize: 11,
     fontWeight: 900,
-    whiteSpace: "nowrap"
+    whiteSpace: "normal"
   },
   selectedSystem: {
     border: "1px solid #22d3ee",
+    overflowWrap: "anywhere",
     borderRadius: 16,
     padding: 16,
     marginTop: 18,
@@ -947,11 +1005,60 @@ const styles: Record<string, CSSProperties> = {
   pillGrid: { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 },
   pill: {
     border: "1px solid #334155",
+    overflowWrap: "anywhere",
     borderRadius: 999,
     padding: "6px 10px",
     color: "#cbd5e1",
     background: "#020617",
     fontSize: 12
+  },
+  pageMobile: {
+    padding: 12,
+    overflowX: "hidden"
+  },
+  heroMobile: {
+    flexDirection: "column",
+    padding: 22
+  },
+  titleMobile: {
+    fontSize: 34,
+    lineHeight: 1.04,
+    letterSpacing: "-1px",
+    maxWidth: "100%",
+    overflowWrap: "anywhere",
+    wordBreak: "break-word"
+  },
+  doctrineMobile: {
+    minWidth: 0,
+    width: "100%"
+  },
+  subtitleMobile: {
+    fontSize: 16,
+    maxWidth: "100%",
+    overflowWrap: "anywhere"
+  },
+  brandMobile: {
+    fontSize: 22,
+    overflowWrap: "anywhere"
+  },
+  oneColumnGrid: {
+    gridTemplateColumns: "1fr"
+  },
+  metricsMobile: {
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))"
+  },
+  executiveMobile: {
+    flexDirection: "column"
+  },
+  panelMobile: {
+    padding: 18,
+    width: "100%"
+  },
+  cardMobile: {
+    minHeight: "auto"
+  },
+  layerCardMobile: {
+    alignItems: "flex-start"
   },
   footer: {
     marginTop: 18,
