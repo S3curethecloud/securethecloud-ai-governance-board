@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -1168,3 +1168,84 @@ def get_board_decision_memo(system_id: str):
         raise HTTPException(status_code=404, detail="AI system not found")
     return _phase8_build_decision_memo(system)
 
+
+# ---------------------------------------------------------------------
+# Phase 11 — Protected demo reset endpoint
+# ---------------------------------------------------------------------
+# This endpoint is for demo hygiene only. It restores the seeded in-memory
+# AI governance records captured at application startup. It does not connect
+# to real patient data, customer data, regulated systems, production model
+# runtimes, clinical systems, or enterprise authorization systems.
+
+import copy as _phase11_copy
+import os as _phase11_os
+
+
+def _phase11_find_ai_system_store():
+    preferred_names = [
+        "AI_SYSTEMS",
+        "ai_systems",
+        "AI_SYSTEM_RECORDS",
+        "ai_system_records",
+        "AI_SYSTEM_STORE",
+        "ai_system_store",
+        "SYSTEMS",
+        "systems",
+        "SEEDED_AI_SYSTEMS",
+        "seeded_ai_systems",
+    ]
+
+    for name in preferred_names:
+        value = globals().get(name)
+        if isinstance(value, list):
+            return value
+
+    for value in globals().values():
+        if not isinstance(value, list) or not value:
+            continue
+
+        first = value[0]
+
+        if isinstance(first, dict) and (
+            "system_id" in first or "system_name" in first or "model_name" in first
+        ):
+            return value
+
+        if any(hasattr(first, attr) for attr in ("system_id", "system_name", "model_name")):
+            return value
+
+    raise RuntimeError("AI governance demo store was not found")
+
+
+_PHASE11_DEMO_BASELINE = _phase11_copy.deepcopy(_phase11_find_ai_system_store())
+
+
+@app.post("/api/demo/reset")
+def phase11_demo_reset(request: Request):
+    configured_token = _phase11_os.getenv("DEMO_RESET_TOKEN")
+
+    if not configured_token:
+        raise HTTPException(
+            status_code=503,
+            detail="Demo reset token is not configured",
+        )
+
+    supplied_token = request.headers.get("X-Demo-Reset-Token", "")
+
+    if supplied_token != configured_token:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid demo reset token",
+        )
+
+    store = _phase11_find_ai_system_store()
+    store.clear()
+    store.extend(_phase11_copy.deepcopy(_PHASE11_DEMO_BASELINE))
+
+    return {
+        "status": "reset",
+        "reset_records": len(store),
+        "message": "Seeded AI governance board demo records restored",
+        "lab_mode": True,
+        "public_demo_boundary": "Simulated AI governance workflow only. No real patient data, customer data, regulated systems, production model runtime, clinical decision systems, or enterprise authorization systems are connected.",
+    }

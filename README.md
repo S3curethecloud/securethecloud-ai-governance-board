@@ -195,3 +195,54 @@ Next phases:
 
 Phase 10 — Fly.io Public Demo Deployment
 Phase 11 — Demo Reset / Kill Switch / Share-Safe Ops
+
+## Share-Safe Demo Operations
+
+The public demo includes protected reset and Fly lifecycle controls.
+
+### Public Demo URLs
+
+Frontend:
+
+```text
+https://securethecloud-ai-governance-board.fly.dev
+```
+
+Backend API:
+
+```text
+https://securethecloud-ai-governance-board-api.fly.dev
+```
+
+### Reset Seeded Demo State
+
+The reset endpoint is protected by an owner reset token.
+
+```bash
+export DEMO_RESET_TOKEN="<owner reset token>"
+
+curl -X POST "https://securethecloud-ai-governance-board-api.fly.dev/api/demo/reset" \
+  -H "X-Demo-Reset-Token: $DEMO_RESET_TOKEN"
+```
+
+### Fly Demo Control
+
+```bash
+scripts/fly_demo_control.sh status
+scripts/fly_demo_control.sh health
+scripts/fly_demo_control.sh reset
+scripts/fly_demo_control.sh off
+scripts/fly_demo_control.sh on
+```
+
+Permanent deletion requires explicit confirmation:
+
+```bash
+CONFIRM_DESTROY=YES scripts/fly_demo_control.sh destroy
+```
+
+### Share-Safe Rule
+
+Share only the frontend URL.
+
+Do not share the reset token, Fly account access, or local environment variables.
