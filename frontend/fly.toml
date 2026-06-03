@@ -3,7 +3,7 @@ primary_region = "iad"
 
 [build]
   [build.args]
-    NEXT_PUBLIC_API_BASE = "https://securethecloud-ai-governance-board-api.fly.dev"
+    NEXT_PUBLIC_API_BASE_URL = "https://securethecloud-ai-governance-board-api.fly.dev"
 
 [http_service]
   internal_port = 3000
