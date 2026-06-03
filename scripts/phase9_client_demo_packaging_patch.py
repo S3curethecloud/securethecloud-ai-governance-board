@@ -1,3 +1,18 @@
+from pathlib import Path
+from textwrap import dedent
+
+root = Path(".")
+docs = root / "docs"
+phases = docs / "phases"
+screenshots = docs / "screenshots"
+
+docs.mkdir(exist_ok=True)
+phases.mkdir(parents=True, exist_ok=True)
+screenshots.mkdir(parents=True, exist_ok=True)
+
+readme = root / "README.md"
+
+readme.write_text(dedent(r'''
 # SecureTheCloud AI Governance Board
 
 A simulated enterprise AI governance review platform for AI system intake, model registry review, risk classification, regulatory mapping, committee approval, evidence package reconstruction, and executive decision memo generation.
@@ -195,3 +210,276 @@ Next phases:
 
 Phase 10 — Fly.io Public Demo Deployment
 Phase 11 — Demo Reset / Kill Switch / Share-Safe Ops
+
+''').strip() + "\n")
+
+(docs / "CLIENT_DEMO_WALKTHROUGH.md").write_text(dedent(r'''
+
+Client Demo Walkthrough
+Demo URL
+
+Local:
+
+http://localhost:3010
+
+Public demo URL will be added after deployment.
+
+Client-Safe Opening
+
+SecureTheCloud AI Governance Board is a simulated enterprise AI governance review platform.
+
+It demonstrates how organizations can review proposed AI systems before adoption, deployment, sensitive-data access, or production use.
+
+This demo does not connect to real patient data, customer data, regulated systems, production model runtimes, clinical systems, or enterprise authorization systems.
+
+Five-Minute Walkthrough
+1. Executive Overview
+
+Show the board-level AI governance operating model.
+
+Explain that the platform is designed around AI governance program questions:
+
+Who owns the AI system?
+What use case does it serve?
+What data does it touch?
+What risk class applies?
+What controls are required?
+What evidence proves the decision?
+2. AI System Intake
+
+Show the AI system intake form.
+
+Highlight:
+
+business owner
+model owner
+model provider
+deployment environment
+data types
+PHI/customer data flags
+patient, financial, safety, and security impact flags
+3. Risk and Required Controls
+
+Use preview to show:
+
+risk score
+risk classification
+governance decision
+risk factors
+required controls
+4. Committee Review
+
+Show the review queue.
+
+Explain that governance committee members can:
+
+approve
+reject
+request controls
+escalate
+5. Regulatory Mapping
+
+Show NIST AI RMF-style mapping:
+
+Govern
+Map
+Measure
+Manage
+
+Show EU AI Act-style classification:
+
+minimal
+limited
+high-risk
+prohibited
+6. HIPAA-Style Review
+
+Show how PHI and patient-impact systems trigger additional review evidence.
+
+7. Evidence Timeline
+
+Show the board audit trail.
+
+Explain that the governance decision can be reconstructed later.
+
+8. Evidence Export and Board Memo
+
+Show:
+
+downloadable JSON evidence packet
+copyable executive decision memo
+public demo boundary
+Closing Line
+
+This lab demonstrates how an AI governance board can intake AI systems, classify risk, map regulatory evidence, route review, and generate board-ready evidence before enterprise AI adoption.
+''').strip() + "\n")
+
+(docs / "DEPLOYMENT_PREP.md").write_text(dedent(r'''
+
+Public Deployment Prep
+Status
+
+Prepared, not deployed.
+
+Intended Future Deployment
+
+Frontend app placeholder:
+
+securethecloud-ai-governance-board
+
+Backend API app placeholder:
+
+securethecloud-ai-governance-board-api
+Required Before Public Sharing
+Confirm README public demo boundary is accurate
+Confirm no secrets are committed
+Confirm seeded data is simulated only
+Confirm backend health endpoint works
+Confirm frontend loads
+Confirm board evidence export works
+Confirm board decision memo works
+Add reset or kill-switch controls in Phase 11
+Add screenshots after public deployment
+Validation Commands
+docker compose down
+docker compose up --build -d
+
+sleep 20
+
+curl http://localhost:8010/health
+curl http://localhost:8010/api/dashboard
+curl -I http://localhost:3010
+Safety Boundary
+
+The public demo must not claim:
+
+production compliance
+legal certification
+HIPAA certification
+EU AI Act compliance certification
+NIST certification
+real clinical review
+real patient data review
+real model runtime enforcement
+real enterprise authorization enforcement
+''').strip() + "\n")
+
+(docs / "SCREENSHOTS.md").write_text(dedent(r'''
+
+Screenshot Checklist
+
+Add final screenshots before public launch.
+
+Recommended Files
+docs/screenshots/01-executive-overview.png
+docs/screenshots/02-ai-system-intake.png
+docs/screenshots/03-governance-review.png
+docs/screenshots/04-nist-eu-hipaa-mapping.png
+docs/screenshots/05-board-audit-trail.png
+docs/screenshots/06-evidence-export-memo.png
+Capture Guidance
+
+Use screenshots that show:
+
+the SecureTheCloud AI Governance Board title
+client-safe demo boundary
+governance operating model
+AI system intake form
+risk and required controls panel
+committee review workspace
+NIST AI RMF mapping
+EU AI Act-style classification
+HIPAA-style review
+board audit trail
+evidence export and board memo
+''').strip() + "\n")
+
+(phases / "PHASE_9_CLIENT_DEMO_PACKAGING_PUBLIC_DEPLOYMENT_PREP.md").write_text(dedent(r'''
+
+Phase 9 — Client Demo Packaging & Public Deployment Prep
+Status
+
+Implementation Complete
+
+Purpose
+
+Phase 9 prepares the SecureTheCloud AI Governance Board repository for public demo deployment and client-safe sharing.
+
+This phase is documentation and packaging only. It does not deploy the app.
+
+Scope
+
+Phase 9 adds:
+
+Polished README introduction
+Client-safe demo walkthrough
+Correct claim / incorrect claim section
+Local run instructions
+Evidence export explanation
+Executive decision memo explanation
+Public deployment preparation notes
+Screenshot placeholder checklist
+Public demo safety boundary
+Phase 9 evidence document
+Public Demo Boundary
+
+This is a simulated AI governance board.
+
+No real patient data, customer data, regulated systems, clinical systems, production model runtimes, enterprise authorization systems, or production enforcement systems are connected.
+
+Correct Claim
+
+The platform demonstrates a governance control pattern for proposed AI systems:
+
+intake
+ownership capture
+model registry context
+risk scoring
+regulatory mapping
+governance committee review
+HIPAA-style review
+evidence timeline
+board evidence export
+executive decision memo
+Incorrect Claims
+
+The platform does not claim:
+
+production compliance
+legal certification
+HIPAA certification
+NIST certification
+EU AI Act certification
+clinical decision support approval
+real enterprise authorization enforcement
+production AI runtime governance
+Artifacts Added
+README.md
+docs/CLIENT_DEMO_WALKTHROUGH.md
+docs/DEPLOYMENT_PREP.md
+docs/SCREENSHOTS.md
+docs/phases/PHASE_9_CLIENT_DEMO_PACKAGING_PUBLIC_DEPLOYMENT_PREP.md
+Validation
+
+Recommended validation:
+
+docker compose down
+docker compose up --build -d
+
+sleep 20
+
+curl http://localhost:8010/health
+curl http://localhost:8010/api/dashboard
+curl -I http://localhost:3010
+Completion Evidence
+Client-safe README package added
+Demo walkthrough added
+Deployment prep notes added
+Screenshot checklist added
+Phase 9 evidence document added
+No deployment performed
+''').strip() + "\n")
+
+(screenshots / ".keep").write_text("Add public demo screenshots here after deployment.\n")
+
+print("Phase 9 client demo packaging and public deployment prep complete.")
